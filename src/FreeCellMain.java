@@ -24,6 +24,8 @@ import java.awt.event.WindowEvent;
  */
 public class FreeCellMain extends JFrame implements ActionListener
 {
+	private static final long serialVersionUID = 1L;
+	
 	private CardPanel cardArea;
 	private JMenuItem newMenuItem, statisticsOption, quitMenuItem;
 	JCheckBoxMenuItem autoCompleteOption, animationOption;

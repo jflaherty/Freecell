@@ -21,6 +21,8 @@ import javax.swing.JPanel;
 public class CardPanel extends JPanel implements MouseListener,
 		MouseMotionListener
 {
+	private static final long serialVersionUID = 1L;
+	
 	// Constants for the table layout
 	public static final int WIDTH = 800;
 	public static final int HEIGHT = 600;

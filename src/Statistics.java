@@ -7,6 +7,8 @@ import java.io.Serializable;
 
 public class Statistics implements Serializable
 {
+	private static final long serialVersionUID = 1L;
+	
 	private int noOfGames, noOfWins;
 	private int currentStreak, longestStreak;
 	private int leastMoves;
