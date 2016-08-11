@@ -1,4 +1,7 @@
+package com.github.jflaherty.cardgames.freecell;
 import java.awt.Point;
+
+import com.github.jflaherty.cardgames.playingcards.french.Card;
 
 /**
  * Keeps track of a moving Cascade know as a Tableau. This Object is Movable and
@@ -36,7 +39,7 @@ public class Tableau extends Cascade implements Movable
 	public void move(Point initialPos, Point finalPos)
 	{
 		for (int index = 0; index < cardsLeft(); index++)
-			((GCard) (hand.get(index))).move(initialPos, finalPos);
+			((FreeCellCard) (hand.get(index))).move(initialPos, finalPos);
 
 		position.x += finalPos.x - initialPos.x;
 		position.y += finalPos.y - initialPos.y;
@@ -47,7 +50,7 @@ public class Tableau extends Cascade implements Movable
 	 * 
 	 * @param otherHand the Hand to check for an intersection
 	 */
-	public boolean intersects(GHand otherHand)
+	public boolean intersects(FreeCellHand otherHand)
 	{
 		// Checks if the tableau intersects the other Hand's top Card
 		if (otherHand.cardsLeft() > 0)
@@ -64,7 +67,7 @@ public class Tableau extends Cascade implements Movable
 	 * 
 	 * @param otherHand the Hand to check if this Tableau can be placed onto
 	 */
-	public boolean canPlaceOn(GHand otherHand)
+	public boolean canPlaceOn(FreeCellHand otherHand)
 	{
 		// Calculate the number of Cards that can be Moved
 		int cardsCanMove = 1 + FreeCell.getNoOfEmptyFreecells();
@@ -89,7 +92,7 @@ public class Tableau extends Cascade implements Movable
 		if (otherHand instanceof Cascade)
 			// Check if the base Card of the Tableau can be placed on the other
 			// Hand
-			return ((GCard) hand.get(0)).canPlaceOn(otherHand);
+			return ((FreeCellCard) hand.get(0)).canPlaceOn(otherHand);
 
 		// Check if the Tableau can be placed on Freecells or Tableaus
 		if (cardsLeft() != 1)
@@ -103,12 +106,12 @@ public class Tableau extends Cascade implements Movable
 	 * 
 	 * @param otherHand the Hand to place the Tableau onto
 	 */
-	public void placeOn(GHand otherHand)
+	public void placeOn(FreeCellHand otherHand)
 	{
 		// Place all the Cards in the Tableau to the other Hand
 		for (int index = 0; index < cardsLeft(); index++)
 		{
-			GCard card = (GCard) hand.get(index);
+			FreeCellCard card = (FreeCellCard) hand.get(index);
 			card.placeOn(otherHand);
 		}
 	}
@@ -120,7 +123,7 @@ public class Tableau extends Cascade implements Movable
 	public void flash()
 	{
 		for (Card card : hand)
-			((GCard) card).flash();
+			((FreeCellCard) card).flash();
 	}
 
 }

@@ -1,3 +1,4 @@
+package com.github.jflaherty.cardgames.freecell;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;

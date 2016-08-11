@@ -1,3 +1,4 @@
+package com.github.jflaherty.cardgames.freecell;
 /**
  * Keeps track of a Move. This class contains methods to undo a Move or to show
  * or not show a Move
@@ -7,8 +8,8 @@
  */
 public class Move
 {
-	private GHand from;
-	private GHand to;
+	private FreeCellHand from;
+	private FreeCellHand to;
 	private Movable moved;
 
 	/**
@@ -18,7 +19,7 @@ public class Move
 	 * @param to the Hand that the Movable was moved to
 	 * @param moved the Movable that was moved
 	 */
-	public Move(GHand from, GHand to, Movable moved)
+	public Move(FreeCellHand from, FreeCellHand to, Movable moved)
 	{
 		this.from = from;
 		this.to = to;
@@ -32,10 +33,10 @@ public class Move
 	{
 		// If only one Card was moved, move the top Card back to the place it
 		// was moved from
-		if (moved instanceof GCard)
+		if (moved instanceof FreeCellCard)
 		{
 			to.removeTopCard();
-			from.addCard((GCard) moved);
+			from.addCard((FreeCellCard) moved);
 			return;
 		}
 

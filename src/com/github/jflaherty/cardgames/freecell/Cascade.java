@@ -1,5 +1,8 @@
+package com.github.jflaherty.cardgames.freecell;
 import java.awt.Point;
 import java.util.ArrayList;
+
+import com.github.jflaherty.cardgames.playingcards.french.Card;
 
 /**
  * Keeps track of a Cascade. Cascades inherits all the behaviors from GHand.
@@ -10,7 +13,7 @@ import java.util.ArrayList;
  * @author Ridout and Veronica Huang
  * @version November 2014
  */
-public class Cascade extends GHand
+public class Cascade extends FreeCellHand
 {
 	static int openCascades;
 
@@ -45,12 +48,12 @@ public class Cascade extends GHand
 		// Cascade, quitting early if we can no longer create a valid Tableau
 		// baseIndex is the index of the base Card of the next Tableau
 		for (int baseIndex = this.hand.size() - 2; baseIndex >= 0
-				&& this.hand.get(baseIndex + 1).canPlaceOnCascade(
+				&& ((FreeCellCard) this.hand.get(baseIndex + 1)).canPlaceOnCascade(
 						this.hand.get(baseIndex)); baseIndex--)
 		{
 			// Create and add the next Tableau with all of its Cards
 			// The position of the Tableau is the position of the base Card
-			Point baseCardPos = ((GCard) hand.get(baseIndex)).getPosition();
+			Point baseCardPos = ((FreeCellCard) hand.get(baseIndex)).getPosition();
 			Tableau nextTableau = new Tableau(baseCardPos.x, baseCardPos.y,
 					this);
 			for (Card cardToAdd : hand.subList(baseIndex, hand.size()))
@@ -72,12 +75,12 @@ public class Cascade extends GHand
 	{
 		// Find the index of the Card where the point is pointing at
 		int index = cardsLeft() - 1;
-		while (index >= 0 && !((GCard) (hand.get(index))).contains(point))
+		while (index >= 0 && !((FreeCellCard) (hand.get(index))).contains(point))
 			index--;
 
 		while (index < cardsLeft() - 1)
 		{
-			if (!hand.get(index + 1).canPlaceOnCascade(hand.get(index)))
+			if (!((FreeCellCard) hand.get(index + 1)).canPlaceOnCascade(hand.get(index)))
 				return false;
 			index++;
 		}
@@ -92,7 +95,7 @@ public class Cascade extends GHand
 	 * 
 	 * @param card the Card to add
 	 */
-	public void addCard(GCard card)
+	public void addCard(FreeCellCard card)
 	{
 		if (this instanceof Tableau)
 		{
@@ -114,9 +117,9 @@ public class Cascade extends GHand
 	 * @param index the index of the GCard to remove
 	 * @return the GCard removed from the Hand
 	 */
-	public GCard removeCard(int index)
+	public FreeCellCard removeCard(int index)
 	{
-		GCard returnCard = super.removeCard(index);
+		FreeCellCard returnCard = super.removeCard(index);
 		if (cardsLeft() == 0)
 		{
 			openCascades++;
@@ -152,25 +155,25 @@ public class Cascade extends GHand
 
 		// Find the index of the Card that the point is pointing at
 		int index = cardsLeft() - 1;
-		while (index > 0 && !((GCard) (hand.get(index))).contains(point))
+		while (index > 0 && !((FreeCellCard) (hand.get(index))).contains(point))
 			index--;
 
 		// Removes a single Card if the point is pointing at the top Card
 		if (index == cardsLeft() - 1)
 		{
-			GCard card = getTopCard();
+			FreeCellCard card = getTopCard();
 			removeTopCard();
 			return card;
 		}
 
 		Tableau tableau = new Tableau(
-				((GCard) hand.get(index)).getPosition().x,
-				((GCard) hand.get(index)).getPosition().y, this);
+				((FreeCellCard) hand.get(index)).getPosition().x,
+				((FreeCellCard) hand.get(index)).getPosition().y, this);
 		// Add all the Cards on top the Card chosen and the chosen Card itself
 		// to the Tableau created
 		while (index < cardsLeft())
 		{
-			GCard card = (GCard) hand.get(index);
+			FreeCellCard card = (FreeCellCard) hand.get(index);
 			removeCard(index);
 			tableau.addCard(card);
 		}

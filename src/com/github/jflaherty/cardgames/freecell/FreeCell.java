@@ -1,3 +1,4 @@
+package com.github.jflaherty.cardgames.freecell;
 import java.awt.Point;
 
 /**
@@ -7,7 +8,7 @@ import java.awt.Point;
  * @author Ridout and Veronica Huang
  * @version November 2014
  */
-public class FreeCell extends GHand
+public class FreeCell extends FreeCellHand
 {
 	static int noOfEmptyFreecells;
 
@@ -46,7 +47,7 @@ public class FreeCell extends GHand
 	 */
 	public Movable pickUp(Point point)
 	{
-		GCard card = getTopCard();
+		FreeCellCard card = getTopCard();
 		removeTopCard();
 		return card;
 	}
@@ -54,7 +55,7 @@ public class FreeCell extends GHand
 	/**
 	 * Adds a Card to the FreeCell while updating the number of empty FreeCells
 	 */
-	public void addCard(GCard card)
+	public void addCard(FreeCellCard card)
 	{
 		super.addCard(card);
 		noOfEmptyFreecells--;
@@ -80,9 +81,9 @@ public class FreeCell extends GHand
 	 * @param index the index of the GCard to remove
 	 * @return the GCard removed from the Hand
 	 */
-	public GCard removeCard(int index)
+	public FreeCellCard removeCard(int index)
 	{
-		GCard returnCard = super.removeCard(index);
+		FreeCellCard returnCard = super.removeCard(index);
 		noOfEmptyFreecells++;
 		return returnCard;
 	}

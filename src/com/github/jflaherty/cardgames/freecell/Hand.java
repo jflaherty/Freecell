@@ -1,6 +1,10 @@
+package com.github.jflaherty.cardgames.freecell;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.StringTokenizer;
+
+import com.github.jflaherty.cardgames.playingcards.exceptions.IllegalCardException;
+import com.github.jflaherty.cardgames.playingcards.french.Card;
 
 /**
  * A Hand Class that contains the information about the Cards in the current
@@ -28,8 +32,9 @@ public class Hand
 	 * 
 	 * @param handString the String that contains information about the Cards in
 	 *            the Hand
+	 * @throws IllegalCardException 
 	 */
-	public Hand(String handString)
+	public Hand(String handString) throws IllegalCardException
 	{
 		StringTokenizer card = new StringTokenizer(handString);
 		hand = new ArrayList<Card>(11);
@@ -80,13 +85,6 @@ public class Hand
 		Collections.sort(hand);
 	}
 
-	/**
-	 * Sorts the Hand by suit
-	 */
-	public void sortBySuit()
-	{
-		Collections.sort(hand, Card.SUIT_ORDER);
-	}
 
 	/**
 	 * Returns the Hand's Cards in a String

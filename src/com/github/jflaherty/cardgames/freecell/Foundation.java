@@ -1,3 +1,4 @@
+package com.github.jflaherty.cardgames.freecell;
 import java.awt.Point;
 
 /**
@@ -8,7 +9,7 @@ import java.awt.Point;
  * @author Ridout and Veronica
  * @version November 2014
  */
-public class Foundation extends GHand
+public class Foundation extends FreeCellHand
 {
 	/**
 	 * Creates a new Foundation with the points given

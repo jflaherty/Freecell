@@ -1,3 +1,4 @@
+package com.github.jflaherty.cardgames.freecell;
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;
@@ -40,7 +41,7 @@ public class FreeCellMain extends JFrame implements ActionListener
 		setResizable(false);
 
 		// Add in an Icon - Ace of Spades
-		setIconImage(new ImageIcon("images\\ace.png").getImage());
+		setIconImage(new ImageIcon("\\images\\french\\ace.png").getImage());
 
 		addWindowListener(new CloseWindow());
 

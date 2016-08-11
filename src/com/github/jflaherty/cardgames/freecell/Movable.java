@@ -1,3 +1,4 @@
+package com.github.jflaherty.cardgames.freecell;
 import java.awt.Graphics;
 import java.awt.Point;
 
@@ -33,7 +34,7 @@ public interface Movable
 	 * @param otherHand the GHand to check for intersection
 	 * @return true if this object intersects the given GHand, false if not
 	 */
-	public boolean intersects(GHand otherHand);
+	public boolean intersects(FreeCellHand otherHand);
 
 	/**
 	 * Checks to see if you can place this object on the given GHand. Behaviour
@@ -42,14 +43,14 @@ public interface Movable
 	 * @return true if this object can be placed on the given GHand, false if
 	 *         not
 	 */
-	public boolean canPlaceOn(GHand otherHand);
+	public boolean canPlaceOn(FreeCellHand otherHand);
 
 	/**
 	 * Places this object on the given GHand adding all of the Cards in this
 	 * object to the GHand
 	 * @param otherHand the GHand to place this object on
 	 */
-	public void placeOn(GHand otherHand);
+	public void placeOn(FreeCellHand otherHand);
 	
 	/**
 	 * Flashes the Movable to show and highlight possible Moves

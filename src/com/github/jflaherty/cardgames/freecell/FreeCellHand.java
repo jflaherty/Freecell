@@ -1,7 +1,10 @@
+package com.github.jflaherty.cardgames.freecell;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Rectangle;
+
+import com.github.jflaherty.cardgames.playingcards.french.Card;
 
 /**
  * An abstract class for a Graphical Hand (GHand). Inherits data and methods
@@ -21,7 +24,7 @@ import java.awt.Rectangle;
  * @version November 2014
  */
 
-public abstract class GHand extends Hand
+public abstract class FreeCellHand extends Hand
 {
 	protected Point position;
 	private int width, height;
@@ -36,12 +39,12 @@ public abstract class GHand extends Hand
 	 * @param y y position of upper left corner of the Hand
 	 * @param spacing horizontal spacing between Cards
 	 */
-	public GHand(int x, int y, int spacing)
+	public FreeCellHand(int x, int y, int spacing)
 	{
 		super();
 		position = new Point(x, y);
-		width = GCard.WIDTH;
-		height = GCard.HEIGHT;
+		width = Card.WIDTH;
+		height = Card.HEIGHT;
 		this.spacing = spacing;
 		flash = false;
 	}
@@ -62,7 +65,7 @@ public abstract class GHand extends Hand
 	 * 
 	 * @param card the Card to add
 	 */
-	public void addCard(GCard card)
+	public void addCard(FreeCellCard card)
 	{
 		if (hand.size() > 0)
 			card.setPosition(new Point(position.x, position.y + hand.size()
@@ -80,9 +83,9 @@ public abstract class GHand extends Hand
 	 * @param index the index of the GCard to remove
 	 * @return the GCard removed from the Hand
 	 */
-	public GCard removeCard(int index)
+	public FreeCellCard removeCard(int index)
 	{
-		GCard cardToRemove = (GCard) hand.remove(index);
+		FreeCellCard cardToRemove = (FreeCellCard) hand.remove(index);
 		updateHeight();
 		return cardToRemove;
 	}
@@ -92,9 +95,9 @@ public abstract class GHand extends Hand
 	 * 
 	 * @return the top GCard is this Hand
 	 */
-	public GCard getTopCard()
+	public FreeCellCard getTopCard()
 	{
-		return (GCard) hand.get(hand.size() - 1);
+		return (FreeCellCard) hand.get(hand.size() - 1);
 	}
 
 	/**
@@ -102,7 +105,7 @@ public abstract class GHand extends Hand
 	 * 
 	 * @return the top GCard removed from the Hand
 	 */
-	public GCard removeTopCard()
+	public FreeCellCard removeTopCard()
 	{
 		return removeCard(hand.size() - 1);
 	}
@@ -113,9 +116,9 @@ public abstract class GHand extends Hand
 	private void updateHeight()
 	{
 		if (hand.size() > 1)
-			height = GCard.HEIGHT + (hand.size() - 1) * spacing;
+			height = Card.HEIGHT + (hand.size() - 1) * spacing;
 		else
-			height = GCard.HEIGHT;
+			height = Card.HEIGHT;
 	}
 
 	/**
@@ -152,7 +155,7 @@ public abstract class GHand extends Hand
 			g.setColor(Color.white);
 		else if (this instanceof Foundation)
 			g.setColor(Color.DARK_GRAY);
-		g.fillRoundRect(position.x, position.y, GCard.WIDTH, GCard.HEIGHT, 8, 8);
+		g.fillRoundRect(position.x, position.y, Card.WIDTH, Card.HEIGHT, 8, 8);
 
 		// Paint the base of the GHand a different color if flash for the hint
 		// is needed
@@ -161,13 +164,13 @@ public abstract class GHand extends Hand
 			g.setColor(Color.getHSBColor(200, 075, 225));
 			if (this instanceof Cascade)
 				g.setColor(Color.YELLOW);
-			g.fillRoundRect(position.x - 5, position.y - 5, GCard.WIDTH + 10,
-					GCard.HEIGHT + 10, 8, 8);
+			g.fillRoundRect(position.x - 5, position.y - 5, Card.WIDTH + 10,
+					Card.HEIGHT + 10, 8, 8);
 		}
 
 		for (Card next : hand)
 		{
-			((GCard) next).draw(g);
+			((FreeCellCard) next).draw(g);
 		}
 	}
 

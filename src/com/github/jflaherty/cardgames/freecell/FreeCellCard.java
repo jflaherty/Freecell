@@ -1,10 +1,13 @@
+package com.github.jflaherty.cardgames.freecell;
+import com.github.jflaherty.cardgames.playingcards.french.Card;
+import com.github.jflaherty.cardgames.playingcards.french.Rank;
+import com.github.jflaherty.cardgames.playingcards.french.Suit;
+
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.Rectangle;
-
-import javax.swing.ImageIcon;
 
 /**
  * Keeps track of a Graphical Card (GCard). Inherits data and methods from Card.
@@ -20,16 +23,12 @@ import javax.swing.ImageIcon;
  * @version November 2014
  *
  */
-public class GCard extends Card implements Movable
+public class FreeCellCard extends Card implements Movable
 {
-	public final static Image BACK_IMAGE = new ImageIcon("images\\blueback.png")
-			.getImage();
-	public final static int WIDTH = BACK_IMAGE.getWidth(null);
-	public final static int HEIGHT = BACK_IMAGE.getHeight(null);
-
 	private Point position;
 	private Image image;
 	private boolean flash;
+	private boolean isFaceUp;
 
 	/**
 	 * Constructs a graphical Card
@@ -38,17 +37,18 @@ public class GCard extends Card implements Movable
 	 * @param suit the suit of the Card
 	 * @param position the initial position of the Card
 	 */
-	public GCard(int rank, int suit, Point position)
+	public FreeCellCard(Rank rank, Suit suit, Point position)
 	{
-		super(rank, suit);
+		this(rank, suit);
 		this.position = position;
-		// Load up the appropriate image file for this card
-		String imageFileName = "" + " cdhs".charAt(suit) + rank + ".png";
-		imageFileName = "images\\" + imageFileName;
-		image = new ImageIcon(imageFileName).getImage();
-
+		
 	}
 
+	public FreeCellCard(Rank rank, Suit suit) {
+		super(rank, suit);
+		this.position = new Point(400 - WIDTH / 2, 470);
+	}
+	
 	/**
 	 * Sets the current position of this GCard
 	 * 
@@ -129,7 +129,7 @@ public class GCard extends Card implements Movable
 	 * @param hand the GHand to check for intersection
 	 * @return true if this GCard intersects the given GHand, false if not
 	 */
-	public boolean intersects(GHand hand)
+	public boolean intersects(FreeCellHand hand)
 	{
 		// Checks if the Hand has any cards in it, if yes, check if the GCard
 		// intersects the topCard
@@ -143,13 +143,13 @@ public class GCard extends Card implements Movable
 	}
 
 	/**
-	 * Checks to see if you can place this GCard on the given GHand. Behaviour
+	 * Checks to see if you can place this GCard on the given GHand. Behavior
 	 * will depend on what kind of GHand we are placing this object on
 	 * 
 	 * @param hand the GHand we want to place this GCard on
 	 * @return true if this GHand can be placed on the given GHand, false if not
 	 */
-	public boolean canPlaceOn(GHand hand)
+	public boolean canPlaceOn(FreeCellHand hand)
 	{
 		// If there are Cards in the Hand, check based on the type of the Hand
 		if (hand.cardsLeft() > 0)
@@ -177,9 +177,39 @@ public class GCard extends Card implements Movable
 	 * 
 	 * @param otherHand the GHand to place this GCard on
 	 */
-	public void placeOn(GHand otherHand)
+	public void placeOn(FreeCellHand otherHand)
 	{
 		otherHand.addCard(this);
+	}
+	
+	/**
+	 * Checks if the current Card can be placed on another Card. Assumes the
+	 * other Card is in a cascade
+	 * 
+	 * @param otherCard the other Card to check if the current Card can be
+	 *            placed on it
+	 * @return true if the current Card can be placed on Cascade, false
+	 *         otherwise
+	 */
+	public boolean canPlaceOnCascade(Card otherCard)
+	{
+		return getRank().asInt() + 1 == otherCard.getRank().asInt() 
+				&& this.getSuit().getSuitColor() != otherCard.getSuit().getSuitColor();
+	}
+
+	/**
+	 * Checks if the current Card can be on top of the other Card on the
+	 * Foundation
+	 * 
+	 * @param otherCard the other Card on the Foundation to check if the current
+	 *            Card can be on top of
+	 * @return true if the current Card can be placed on top of the other Card,
+	 *         false otherwise
+	 */
+	public boolean canPlaceOnFoundation(Card otherCard)
+	{
+		return this.getSuit() == otherCard.getSuit() 
+				&& this.getRank().asInt() == otherCard.getRank().asInt() + 1;
 	}
 
 	/**
@@ -188,6 +218,29 @@ public class GCard extends Card implements Movable
 	public void flash()
 	{
 		flash = !flash;
+	}
+	
+	/**
+	 * Flips the Card to the opposite side
+	 */
+	public void flip()
+	{
+		isFaceUp = !isFaceUp;
+	}
+
+	/**
+	 * Checks if a Card is faced up
+	 * 
+	 * @return true if the Card is faced up and false if the Card is faced down
+	 */
+	public boolean isFaceUp()
+	{
+		return isFaceUp;
+	}
+	
+	public String toString() {
+		return super.getHandNotation();
+		
 	}
 
 }

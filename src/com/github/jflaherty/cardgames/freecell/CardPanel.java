@@ -1,3 +1,4 @@
+package com.github.jflaherty.cardgames.freecell;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -8,6 +9,9 @@ import java.util.LinkedList;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+
+import com.github.jflaherty.cardgames.playingcards.exceptions.EmptyDeckException;
+import com.github.jflaherty.cardgames.playingcards.french.Card;
 
 /**
  * Looks after most of the FreeCell Game. The moves made in the game can be undo
@@ -51,12 +55,13 @@ public class CardPanel extends JPanel implements MouseListener,
 	private FreeCellMain parentFrame;
 	private LinkedList<Move> moves;
 
-	private GDeck myDeck;
-	private ArrayList<GHand> allHands;
+	private FreeCellDeck myDeck;
+	private ArrayList<FreeCellHand> allHands;
 	private Movable selectedItem;
-	private GHand sourceHand;
+	private FreeCellHand sourceHand;
 	private Point lastPoint;
-	private GCard movingCard;
+	private Point startingPoint;
+	private FreeCellCard movingCard;
 
 	private Statistics statistic;
 
@@ -78,16 +83,17 @@ public class CardPanel extends JPanel implements MouseListener,
 	{
 		// Set up the size and background colour
 		setPreferredSize(new Dimension(WIDTH, HEIGHT));
-		this.setBackground(TABLE_COLOUR);
+		setBackground(TABLE_COLOUR);
 		this.parentFrame = parentFrame;
+		this.startingPoint = new Point(400 - Card.WIDTH / 2, 470);
 
 		// Add mouse listeners to the card panel
 		this.addMouseListener(this);
 		this.addMouseMotionListener(this);
 
 		// Set up the deck, cascades, foundations and free cells
-		myDeck = new GDeck(400 - GCard.WIDTH / 2, 470);
-		allHands = new ArrayList<GHand>();
+		myDeck = new FreeCellDeck(startingPoint);
+		allHands = new ArrayList<FreeCellHand>();
 
 		// Create Cascades
 		int xCascade = CASCADE_X;
@@ -128,6 +134,7 @@ public class CardPanel extends JPanel implements MouseListener,
 	/**
 	 * Starts up a new game by clearing all of the Hands, shuffling the Deck and
 	 * dealing new Cards to the Cascades. Also resets the move list
+	 * @throws EmptyDeckException 
 	 */
 	public void newGame()
 	{
@@ -139,9 +146,9 @@ public class CardPanel extends JPanel implements MouseListener,
 
 		// Deal the Cards to the Cascades (first 8 Hands)
 		int cascasdeIndex = 0;
-		while (myDeck.cardsLeft() > 0)
+		while (myDeck.getCount() > 0)
 		{
-			GCard dealtCard = myDeck.dealCard();
+			FreeCellCard dealtCard = myDeck.dealCard();
 			Point pos = new Point(dealtCard.getPosition());
 			allHands.get(cascasdeIndex).addCard(dealtCard);
 			Point finalPos = new Point(dealtCard.getPosition());
@@ -149,6 +156,7 @@ public class CardPanel extends JPanel implements MouseListener,
 				moveACard(dealtCard, pos, finalPos);
 			if (!dealtCard.isFaceUp())
 				dealtCard.flip();
+			paintImmediately(0, 0, getWidth(), getHeight());
 			cascasdeIndex++;
 			if (cascasdeIndex == NO_OF_CASCADES)
 				cascasdeIndex = 0;
@@ -203,7 +211,7 @@ public class CardPanel extends JPanel implements MouseListener,
 	 */
 	public void endGame()
 	{
-		for (GHand hand : allHands)
+		for (FreeCellHand hand : allHands)
 		{
 			if (hand.cardsLeft() != 0)
 			{
@@ -243,14 +251,14 @@ public class CardPanel extends JPanel implements MouseListener,
 	{
 		ArrayList<Move> allMoves = new ArrayList<Move>();
 		// Get all moves from each of the Cascades
-		for (GHand from : allHands.subList(0, NO_OF_CASCADES))
+		for (FreeCellHand from : allHands.subList(0, NO_OF_CASCADES))
 		{
 			for (Movable movable : ((Cascade) from).getAllMovables())
 			{
 				// See if any of these Movables can be placed on another
 				// Cascade. It turns out the "from != to" check is not
 				// needed but it is less work than calling canPlaceOn
-				for (GHand to : allHands.subList(0, NO_OF_CASCADES))
+				for (FreeCellHand to : allHands.subList(0, NO_OF_CASCADES))
 				{
 					if (from != to && movable.canPlaceOn(to))
 						allMoves.add(new Move(from, to, movable));
@@ -275,11 +283,11 @@ public class CardPanel extends JPanel implements MouseListener,
 			g.drawImage(fireWork, 0, 0, null);
 
 		// Draw the deck if there are cards left
-		if (myDeck.cardsLeft() > 0)
+		if (myDeck.getCount() > 0)
 			myDeck.draw(g);
 
 		// Draw all of the Hands
-		for (GHand next : allHands)
+		for (FreeCellHand next : allHands)
 			next.draw(g);
 
 		// For animation to draw the moving Card
@@ -310,21 +318,21 @@ public class CardPanel extends JPanel implements MouseListener,
 
 		// Search through the Cascades and FreeCells to see if any cards can be
 		// placed onto a foundation
-		for (GHand hand : allHands.subList(0, NO_OF_CASCADES + NO_OF_FREECELLS))
+		for (FreeCellHand hand : allHands.subList(0, NO_OF_CASCADES + NO_OF_FREECELLS))
 		{
-			for (GHand foundation : allHands.subList(NO_OF_CASCADES
+			for (FreeCellHand foundation : allHands.subList(NO_OF_CASCADES
 					+ NO_OF_FREECELLS, allHands.size()))
 			{
 				if (hand.cardsLeft() > 0)
 				{
-					GCard topCard = hand.getTopCard();
+					FreeCellCard topCard = hand.getTopCard();
 
 					// If the top Card can be placed on Foundation and the rank
 					// of the top Card is less than or equal to two, or there
 					// are no more Cards that can be placed on top of the top
 					// Card, move the Card to the corresponding foundation
 					if (topCard.canPlaceOn(foundation)
-							&& (topCard.getRank() <= 2 || !canPlaceBelowCard(topCard)))
+							&& (topCard.getRank().asInt() <= 2 || !canPlaceBelowCard(topCard)))
 					{
 						sourceHand = hand;
 						selectedItem = hand.removeTopCard();
@@ -358,16 +366,16 @@ public class CardPanel extends JPanel implements MouseListener,
 	 * @return true if there are Cards that can be placed onto it, false
 	 *         otherwise
 	 */
-	private boolean canPlaceBelowCard(GCard topCard)
+	private boolean canPlaceBelowCard(FreeCellCard topCard)
 	{
-		for (GHand cascade : allHands.subList(0, NO_OF_CASCADES
+		for (FreeCellHand cascade : allHands.subList(0, NO_OF_CASCADES
 				+ NO_OF_FREECELLS))
 		{
 			for (Card card : cascade.hand)
 			{
 				// If any other Card can be placed on the current Card, return
 				// true
-				if (card.canPlaceOnCascade(topCard))
+				if (((FreeCellCard) card).canPlaceOnCascade(topCard))
 					return true;
 			}
 		}
@@ -381,7 +389,7 @@ public class CardPanel extends JPanel implements MouseListener,
 	 */
 	private boolean checkForWinner()
 	{
-		for (GHand nextFoundation : allHands.subList(NO_OF_CASCADES
+		for (FreeCellHand nextFoundation : allHands.subList(NO_OF_CASCADES
 				+ NO_OF_FREECELLS, allHands.size()))
 		{
 			if (nextFoundation.cardsLeft() < 13)
@@ -416,11 +424,11 @@ public class CardPanel extends JPanel implements MouseListener,
 	{
 		// Checks if any card on any of the Cards in FreeCell can be placed on
 		// Cascades or Foundations
-		for (GHand freecell : allHands.subList(NO_OF_CASCADES, NO_OF_CASCADES
+		for (FreeCellHand freecell : allHands.subList(NO_OF_CASCADES, NO_OF_CASCADES
 				+ NO_OF_FREECELLS))
 		{
 			if (freecell.cardsLeft() > 0)
-				for (GHand hand : allHands.subList(NO_OF_CASCADES,
+				for (FreeCellHand hand : allHands.subList(NO_OF_CASCADES,
 						NO_OF_CASCADES + NO_OF_FREECELLS + NO_OF_FOUNDATIONS))
 				{
 					if (hand.cardsLeft() > 0
@@ -470,7 +478,7 @@ public class CardPanel extends JPanel implements MouseListener,
 					leastCardsCascade = cascade;
 			}
 
-			for (GHand freecell : allHands.subList(NO_OF_CASCADES,
+			for (FreeCellHand freecell : allHands.subList(NO_OF_CASCADES,
 					NO_OF_CASCADES + NO_OF_FREECELLS))
 			{
 				// Show the hint of placing Cards onto empty FreeCells
@@ -509,7 +517,7 @@ public class CardPanel extends JPanel implements MouseListener,
 	 * @param fromPos initial position of the Card
 	 * @param toPos final position of the Card
 	 */
-	public void moveACard(final GCard cardToMove, Point fromPos, Point toPos)
+	public void moveACard(final FreeCellCard cardToMove, Point fromPos, Point toPos)
 	{
 		int dx = (toPos.x - fromPos.x) / ANIMATION_FRAMES;
 		int dy = (toPos.y - fromPos.y) / ANIMATION_FRAMES;
@@ -558,7 +566,7 @@ public class CardPanel extends JPanel implements MouseListener,
 		// Pick up one of cards from a Hand (Freecell or Cascade)
 		// Could also pick up from a Foundation if you want
 
-		for (GHand nextHand : allHands)
+		for (FreeCellHand nextHand : allHands)
 		{
 			if (nextHand.contains(selectedPoint)
 					&& nextHand.canPickUp(selectedPoint))
@@ -587,7 +595,7 @@ public class CardPanel extends JPanel implements MouseListener,
 		{
 			// Check to see if we can add this to another cascade
 			// foundation or free cell
-			for (GHand nextHand : allHands)
+			for (FreeCellHand nextHand : allHands)
 			{
 				if (selectedItem.intersects(nextHand)
 						&& selectedItem.canPlaceOn(nextHand))
@@ -654,7 +662,7 @@ public class CardPanel extends JPanel implements MouseListener,
 	{
 		// Set the cursor to the hand if we are on a card that we can pick up
 		Point currentPoint = event.getPoint();
-		for (GHand nextHand : allHands)
+		for (FreeCellHand nextHand : allHands)
 		{
 			if (nextHand.contains(currentPoint)
 					&& nextHand.canPickUp(currentPoint))

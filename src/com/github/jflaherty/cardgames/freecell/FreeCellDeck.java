@@ -1,3 +1,10 @@
+package com.github.jflaherty.cardgames.freecell;
+import com.github.jflaherty.cardgames.playingcards.exceptions.EmptyDeckException;
+import com.github.jflaherty.cardgames.playingcards.french.Card;
+import com.github.jflaherty.cardgames.playingcards.french.Deck;
+import com.github.jflaherty.cardgames.playingcards.french.Rank;
+import com.github.jflaherty.cardgames.playingcards.french.Suit;
+
 import java.awt.Graphics;
 import java.awt.Point;
 
@@ -8,50 +15,71 @@ import java.awt.Point;
  * @author Ridout
  * @version November 2014
  */
-public class GDeck extends Deck
+public class FreeCellDeck extends Deck
 {
 	private Point position;
+	
+	public FreeCellDeck() {
+		this(new Point(400 - Card.WIDTH / 2, 470));
+	}
 
 	/**
 	 * Constructs a new Graphical Deck (GDeck)
 	 * @param x the x coordinate of the upper left corner of the GDeck
 	 * @param y the y coordinate of the upper left corner of the GDeck
 	 */
-	public GDeck(int x, int y)
+	public FreeCellDeck(Point position)
 	{
-		this.position = new Point(x, y);
-		topCard = 0;
-		deck = new GCard[52];
-
-		for (int suit = 1; suit <= 4; suit++)
-			for (int rank = 1; rank <= 13; rank++)
-				deck[topCard++] = new GCard(rank, suit, position);
-
+		super();
+		this.position = position;
+		for(Card card : deck) {
+			FreeCellCard nextCard = (FreeCellCard) card;
+			nextCard.setPosition(position);
+		}
+		
+	}
+	
+	protected void initialize() {
+		for (Suit s : Suit.values()) {
+			for (Rank r : Rank.values()) {
+				if(r.equals(Rank.ACE_H))
+					continue;
+				deck.add(new FreeCellCard(r, s));
+			}
+		}
 	}
 
 	/**
 	 * Shuffles the GDeck by shuffling all of the Cards. Also sets the position
-	 * of all of the Cards in the GDeck back to the GDecks's positions
+	 * of all of the Cards in the GDeck back to the GDecks's original position
 	 */
 	public void shuffle()
 	{
-		super.shuffle();
+		super.shuffleDeck();
 
 		// Put the cards back to the position of the Deck
-		for (int index = 0; index < topCard; index++)
-		{
-			GCard nextCard = (GCard) deck[index];
+		
+		for (Card card : deck) {
+			FreeCellCard nextCard = (FreeCellCard) card;
 			nextCard.setPosition(position);
+			if(nextCard.isFaceUp()) {
+				nextCard.flip();
+			}
 		}
 	}
 
 	/**
 	 * Deals a GCard from this GDeck
 	 * @return the dealt GCard
+	 * @throws EmptyDeckException 
 	 */
-	public GCard dealCard()
+	public FreeCellCard dealCard()
 	{
-		return (GCard) super.dealCard();
+		try {
+			return (FreeCellCard) super.drawTopCard();
+		} catch (EmptyDeckException e) {
+			return null;
+		}
 	}
 
 	/**
@@ -60,9 +88,9 @@ public class GDeck extends Deck
 	 */
 	public void draw(Graphics g)
 	{
-		for (int index = 0; index < topCard; index++)
+		for (Card card : deck) 
 		{
-			GCard nextCard = (GCard) deck[index];
+			FreeCellCard nextCard = (FreeCellCard) card;
 			nextCard.draw(g);
 		}
 	}
